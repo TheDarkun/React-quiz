@@ -42,6 +42,12 @@ const reducer = (state, {type, payload}) => {
                     ? state["points"] + question["points"] 
                     : state["points"]
             }
+        case "nextQuestion":
+            return {
+                ...state,
+                answer: null,
+                index: state["index"] + 1
+            }
         default:
             throw new Error("Action unknown");
     }
@@ -65,7 +71,13 @@ export default function App() {
                 {status === "loading" && <Loader/>}
                 {status === "error" && <Error/>}
                 {status === "ready" && <StartScreen numQuestion={questions.length} dispatch={dispatch}/>}
-                {status === "active" && <Question question={questions[index]} dispatch={dispatch} answer={answer}/>}
+                {status === "active" && (
+                    <>
+                        <Question question={questions[index]} dispatch={dispatch} answer={answer}/>
+                        {answer !== null && <button className="btn btn-ui" onClick={() => dispatch({type: "nextQuestion"})}>Next</button>}
+                    </>
+                    )}
+                    
             </Main>
         </div>
     );
