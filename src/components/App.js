@@ -5,6 +5,7 @@ import Loader from "./Loader";
 import Error from "./Error";
 import StartScreen from "./StartScreen";
 import Question from "./Question";
+import ProgressBar from "./ProgressBar";
 
 const initialState = {
     questions: [],
@@ -56,8 +57,11 @@ const reducer = (state, {type, payload}) => {
 
 export default function App() {
 
-    const [{questions, status, index, answer}, dispatch] = useReducer(reducer, initialState);
-
+    const [{questions, status, index, answer, points}, dispatch] = useReducer(reducer, initialState);
+    const maxPossiblePoints = questions.reduce((acc, question) => {
+        return acc + question["points"]
+    }, 0)
+    
     useEffect(() => {
         fetch("http://localhost:7979/questions")
             .then(result => result.json())
@@ -73,6 +77,11 @@ export default function App() {
                 {status === "ready" && <StartScreen numQuestion={questions.length} dispatch={dispatch}/>}
                 {status === "active" && (
                     <>
+                        <ProgressBar 
+                            i={index} 
+                            numQuestion={questions.length} 
+                            points={points}
+                            maxPossiblePoints={maxPossiblePoints}/>
                         <Question question={questions[index]} dispatch={dispatch} answer={answer}/>
                         {answer !== null && <button className="btn btn-ui" onClick={() => dispatch({type: "nextQuestion"})}>Next</button>}
                     </>
